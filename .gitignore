@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+rockenv/
+env/
+venv/
+
+# Logs and results
+*.log
+*.csv
+results/
+uploads/
+
+# Saved models
+saved_models/
+
+# VSCode settings
+.vscode/
+
+# Mac/Windows OS files
+.DS_Store
+Thumbs.db
+
+
+rock_detection_back_end/
+__pycache__/
+rockenv/
+*.pyc
+*.pth
+*.pt
