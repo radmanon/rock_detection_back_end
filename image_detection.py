@@ -1,6 +1,7 @@
 import os
 import torch
 import torchvision
+import requests
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision import transforms as T
 from PIL import Image, ImageDraw
@@ -11,9 +12,22 @@ def get_model(num_classes=10):
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     return model
 
+def download_model_if_needed(model_path):
+    if not os.path.exists(model_path):
+        print("📦 Downloading model from Dropbox...")
+        url = "https://www.dropbox.com/scl/fi/nalx3tv2tqise73b94bnh/rock_detector_epoch11.pth?rlkey=jh38rburh70lff7mzaqd20vuc&st=ogqhk7gg&dl=1"
+        response = requests.get(url)
+        with open(model_path, "wb") as f:
+            f.write(response.content)
+        print("✅ Model downloaded to:", model_path)
+
 # This function is used by your FastAPI server
-def predict_on_image(image_path, model_path = "/mnt/data/rock_detector_epoch11.pth", threshold=0.6):
+def predict_on_image(image_path, model_path="/mnt/data/rock_detector_epoch11.pth", threshold=0.6):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    # Download the model if it doesn't exist yet
+    download_model_if_needed(model_path)
+
     model = get_model()
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.to(device)
@@ -43,4 +57,3 @@ def predict_on_image(image_path, model_path = "/mnt/data/rock_detector_epoch11.p
     image.save(output_path)
 
     return os.path.basename(output_path)  # returns only the file name, like 'q6.jpg'
-  # <--- Now returns path to use in API
