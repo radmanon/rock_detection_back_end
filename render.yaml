@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: rock-detection-backend
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "./start.sh"
+    disk:
+      name: model-disk
+      mountPath: /mnt/data
+      sizeGB: 1
