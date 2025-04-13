@@ -12,7 +12,7 @@ def get_model(num_classes=10):
     return model
 
 # This function is used by your FastAPI server
-def predict_on_image(image_path, model_path='saved_models/rock_detector_epoch11.pth', threshold=0.6):
+def predict_on_image(image_path, model_path = "/mnt/data/rock_detector_epoch11.pth", threshold=0.6):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = get_model()
     model.load_state_dict(torch.load(model_path, map_location=device))

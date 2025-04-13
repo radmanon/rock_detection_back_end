@@ -8,8 +8,11 @@ import cv2
 import time
 import threading
 
-from predict import predict_on_image
-from webcam_detect import run_frame  # For live stream endpoint
+from image_detection import predict_on_image
+from live_webcam_detection import run_frame  # For live stream endpoint
+
+os.makedirs("results", exist_ok=True)
+os.makedirs("uploads", exist_ok=True)
 
 
 # -------------------- FastAPI Setup --------------------
@@ -42,14 +45,19 @@ async def predict_image(file: UploadFile = File(...)):
     })
 
 # -------------------- Live Detection via Separate Window --------------------
+# @app.get("/start-detection")
+# def start_live_detection():
+#     def run_live():
+#         import live_webcam_detection
+#         live_webcam_detection.run_camera()  # Opens cv2 GUI locally
+#     thread = threading.Thread(target=run_live)
+#     thread.start()
+#     return {"status": "🎥 Live detection started"}
 @app.get("/start-detection")
 def start_live_detection():
-    def run_live():
-        import webcam_detect
-        webcam_detect.run_camera()  # Opens cv2 GUI locally
-    thread = threading.Thread(target=run_live)
-    thread.start()
-    return {"status": "🎥 Live detection started"}
+    return {"status": "❌ Live detection with webcam is only available locally."}
+
+
 
 # -------------------- Video Feed Stream (for embedded webcam) --------------------
 def generate_frames():
@@ -65,9 +73,9 @@ def generate_frames():
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         time.sleep(0.05)
 
-@app.get("/video_feed")
-def video_feed():
-    return StreamingResponse(generate_frames(), media_type="multipart/x-mixed-replace; boundary=frame")
+# @app.get("/video_feed")
+# def video_feed():
+#     return StreamingResponse(generate_frames(), media_type="multipart/x-mixed-replace; boundary=frame")
 
 
 from fastapi.responses import FileResponse

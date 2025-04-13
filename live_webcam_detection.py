@@ -30,44 +30,48 @@ def draw_boxes(frame, boxes, scores, threshold=0.85, size_threshold=2500):
             cv2.putText(frame, label, (int(x1), int(y1)-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
     return frame
 
-def run_camera(model_path='saved_models/rock_detector_epoch11.pth'):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = get_model(num_classes=10)
-    model.load_state_dict(torch.load(model_path, map_location=device))
-    model.to(device)
-    model.eval()
+# def run_camera(model_path = "/mnt/data/rock_detector_epoch11.pth"):
+#     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#     model = get_model(num_classes=10)
+#     model.load_state_dict(torch.load(model_path, map_location=device))
+#     model.to(device)
+#     model.eval()
 
-    cap = cv2.VideoCapture(0)  # 0 = default webcam
+#     # doesnt work on render
+#     # cap = cv2.VideoCapture(0)  # 0 = default webcam
 
-    print("🎥 Starting live rock detection... Press 'q' to quit.")
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+#     print("🎥 Starting live rock detection... Press 'q' to quit.")
+#     while True:
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
 
-        # Convert BGR to RGB
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        input_tensor = transform_frame(rgb_frame).to(device)
+#         # Convert BGR to RGB
+#         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         input_tensor = transform_frame(rgb_frame).to(device)
 
-        with torch.no_grad():
-            output = model(input_tensor)[0]
+#         with torch.no_grad():
+#             output = model(input_tensor)[0]
 
-        boxes = output['boxes'].cpu()
-        scores = output['scores'].cpu()
+#         boxes = output['boxes'].cpu()
+#         scores = output['scores'].cpu()
 
-        frame = draw_boxes(frame, boxes, scores)
+#         frame = draw_boxes(frame, boxes, scores)
 
-        cv2.imshow("Rock Detection (Live)", frame)
+#         # In production: skip GUI display
+#         # For Render, do nothing or log
+        
+#         # cv2.imshow("Rock Detection (Live)", frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             break
 
-    cap.release()
-    cv2.destroyAllWindows()
-    print("🛑 Detection stopped.")
+#     cap.release()
+#     cv2.destroyAllWindows()
+#     print("🛑 Detection stopped.")
 
 # ✅ Add this function at the bottom so /video_feed can use it
-def run_frame(frame, model_path='saved_models/rock_detector_epoch11.pth'):
+def run_frame(frame, model_path='/mnt/data/rock_detector_epoch11.pth'):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     if not hasattr(run_frame, "model"):
